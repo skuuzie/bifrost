@@ -1,0 +1,42 @@
+admin:
+  allow-send-email: true
+  token: ''
+crypto:
+  common-key: 'base64'
+  secret-token-key: 'base64'
+db:
+  aurora:
+    cluster:
+      endpoint: ''
+      region: ''
+    table:
+      parameters: ''
+logging:
+  level:
+    io.lettuce.core: ''
+    org.springframework.data.redis: ''
+monitoring:
+  cloudwatch:
+    group-name: ''
+    region: ''
+    stream-name: ''
+parameter:
+  encryption-rules: ''
+  user-token-rules: ''
+spring:
+  data:
+    redis:
+      host: ''
+      port: ''
+      ssl:
+        enabled: true
+  mail:
+    host: ''
+    password: ''
+    port: ''
+    properties:
+      mail.smtp.auth: ''
+      mail.smtp.starttls.enable: ''
+    username: ''
+springdoc:
+  paths-to-exclude: ''
