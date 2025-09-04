@@ -1,9 +1,10 @@
 package com.bifrost.demo.repository.parameter;
 
+import com.bifrost.demo.constants.DBConstants;
+import com.bifrost.demo.data.AuroraDB;
 import com.bifrost.demo.dto.model.DataEntry;
-import com.bifrost.demo.service.util.CoreDB;
-import com.bifrost.demo.service.util.DateUtil;
-import com.bifrost.demo.service.util.JSONUtil;
+import com.bifrost.demo.util.DateUtil;
+import com.bifrost.demo.util.JSONUtil;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
@@ -15,15 +16,18 @@ import java.util.UUID;
 
 @Repository
 public class DefaultParameterRepository implements ParameterRepository {
-    private final CoreDB _db;
+    private final AuroraDB _db;
 
-    public DefaultParameterRepository(CoreDB db) {
+    public DefaultParameterRepository(AuroraDB db) {
         this._db = db;
     }
 
     @Override
     public DataEntry getEntryById(String id) throws SQLException {
-        String selectSql = String.format("SELECT * FROM %s WHERE id = ?", _db.PARAMETERS_TABLE_NAME);
+        String selectSql = "SELECT * FROM %s WHERE %s = ?".formatted(
+                DBConstants.ParameterRegistryTable.NAME,
+                DBConstants.ParameterRegistryTable.COL_ID
+        );
 
         PreparedStatement stmt = this._db.getConnection().prepareStatement(selectSql);
         stmt.setString(1, id);
@@ -31,12 +35,12 @@ public class DefaultParameterRepository implements ParameterRepository {
 
         if (rs.next()) {
             return new DataEntry(
-                    rs.getString("id"),
-                    rs.getString("description"),
-                    rs.getString("key"),
-                    JSONUtil.parseIfJson(rs.getString("value")),
-                    DateUtil.toFormattedDate(rs.getTimestamp("created_at").toLocalDateTime()),
-                    DateUtil.toFormattedDate(rs.getTimestamp("updated_at").toLocalDateTime()));
+                    rs.getString(DBConstants.ParameterRegistryTable.COL_ID),
+                    rs.getString(DBConstants.ParameterRegistryTable.COL_DESCRIPTION),
+                    rs.getString(DBConstants.ParameterRegistryTable.COL_KEY),
+                    JSONUtil.parseIfJson(rs.getString(DBConstants.ParameterRegistryTable.COL_VALUE)),
+                    DateUtil.toFormattedDate(rs.getTimestamp(DBConstants.ParameterRegistryTable.COL_CREATED).toLocalDateTime()),
+                    DateUtil.toFormattedDate(rs.getTimestamp(DBConstants.ParameterRegistryTable.COL_CREATED).toLocalDateTime()));
         }
 
         return null;
@@ -44,10 +48,18 @@ public class DefaultParameterRepository implements ParameterRepository {
 
     @Override
     public DataEntry createNewEntry(DataEntry entry) throws SQLException {
-        String query = String.format("""
-                    INSERT INTO %s (id, key, value, description, created_at, updated_at)
+        String query = """
+                    INSERT INTO %s (%s, %s, %s, %s, %s, %s)
                     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-                """, _db.PARAMETERS_TABLE_NAME);
+                """.formatted(
+                        DBConstants.ParameterRegistryTable.NAME,
+                        DBConstants.ParameterRegistryTable.COL_ID,
+                        DBConstants.ParameterRegistryTable.COL_KEY,
+                        DBConstants.ParameterRegistryTable.COL_VALUE,
+                        DBConstants.ParameterRegistryTable.COL_DESCRIPTION,
+                        DBConstants.ParameterRegistryTable.COL_CREATED,
+                        DBConstants.ParameterRegistryTable.COL_UPDATED
+        );
 
         PreparedStatement stmt = this._db.getConnection().prepareStatement(query);
 
@@ -66,11 +78,18 @@ public class DefaultParameterRepository implements ParameterRepository {
 
     @Override
     public boolean updateEntry(DataEntry entry) throws SQLException {
-        String query = String.format("""
+        String query = """
                     UPDATE %s
-                    SET key = ?, value = ?, description = ?, updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?;
-                """, _db.PARAMETERS_TABLE_NAME);
+                    SET %s = ?, %s = ?, %s = ?, %s = CURRENT_TIMESTAMP
+                    WHERE %s = ?;
+                """.formatted(
+                DBConstants.ParameterRegistryTable.NAME,
+                DBConstants.ParameterRegistryTable.COL_KEY,
+                DBConstants.ParameterRegistryTable.COL_VALUE,
+                DBConstants.ParameterRegistryTable.COL_DESCRIPTION,
+                DBConstants.ParameterRegistryTable.COL_UPDATED,
+                DBConstants.ParameterRegistryTable.COL_ID
+        );
 
         PreparedStatement stmt = this._db.getConnection().prepareStatement(query);
         stmt.setString(1, entry.key());
@@ -83,7 +102,10 @@ public class DefaultParameterRepository implements ParameterRepository {
 
     @Override
     public boolean deleteEntryById(String id) throws SQLException {
-        String sql = "DELETE FROM parameters WHERE id = ?";
+        String sql = "DELETE FROM %s WHERE %s = ?".formatted(
+                DBConstants.ParameterRegistryTable.NAME,
+                DBConstants.ParameterRegistryTable.COL_ID
+        );
 
         PreparedStatement stmt = this._db.getConnection().prepareStatement(sql);
         stmt.setString(1, id);
@@ -93,7 +115,10 @@ public class DefaultParameterRepository implements ParameterRepository {
 
     @Override
     public List<DataEntry> getEntries(int limit) throws SQLException {
-        String selectSql = String.format("SELECT * FROM %s ORDER BY created_at DESC LIMIT ?", _db.PARAMETERS_TABLE_NAME);
+        String selectSql = "SELECT * FROM %s ORDER BY %s DESC LIMIT ?".formatted(
+                DBConstants.ParameterRegistryTable.NAME,
+                DBConstants.ParameterRegistryTable.COL_CREATED
+        );
         List<DataEntry> entries = new ArrayList<>();
 
         PreparedStatement stmt = this._db.getConnection().prepareStatement(selectSql);
@@ -102,12 +127,12 @@ public class DefaultParameterRepository implements ParameterRepository {
 
         while (rs.next()) {
             entries.add(new DataEntry(
-                    rs.getString("id"),
-                    rs.getString("description"),
-                    rs.getString("key"),
-                    JSONUtil.parseIfJson(rs.getString("value")),
-                    DateUtil.toFormattedDate(rs.getTimestamp("created_at").toLocalDateTime()),
-                    DateUtil.toFormattedDate(rs.getTimestamp("updated_at").toLocalDateTime())
+                    rs.getString(DBConstants.ParameterRegistryTable.COL_ID),
+                    rs.getString(DBConstants.ParameterRegistryTable.COL_DESCRIPTION),
+                    rs.getString(DBConstants.ParameterRegistryTable.COL_KEY),
+                    JSONUtil.parseIfJson(rs.getString(DBConstants.ParameterRegistryTable.COL_VALUE)),
+                    DateUtil.toFormattedDate(rs.getTimestamp(DBConstants.ParameterRegistryTable.COL_CREATED).toLocalDateTime()),
+                    DateUtil.toFormattedDate(rs.getTimestamp(DBConstants.ParameterRegistryTable.COL_UPDATED).toLocalDateTime())
             ));
         }
 
