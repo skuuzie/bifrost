@@ -6,7 +6,7 @@ import com.bifrost.demo.dto.response.BaseResponse;
 import com.bifrost.demo.dto.response.ServiceResponse;
 import com.bifrost.demo.service.authentication.JWTService;
 import com.bifrost.demo.service.authentication.TokenService;
-import com.bifrost.demo.service.util.JSONUtil;
+import com.bifrost.demo.util.JSONUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;

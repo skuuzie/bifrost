@@ -37,20 +37,20 @@ public final class JSONEntry {
         if (node != null && node.isArray() && index < node.size()) {
             return new JSONEntry(node.get(index));
         } else {
-            return new JSONEntry(null); // safe null
+            return new JSONEntry(null);
         }
     }
 
-    public String asString() {
-        return (node != null && node.isValueNode()) ? node.asText() : null;
+    public String asString(String defaultValue) {
+        return (node != null && node.isValueNode()) ? node.asText() : defaultValue;
     }
 
-    public Integer asInt() {
-        return (node != null && node.isInt()) ? node.asInt() : null;
+    public Integer asInt(Integer defaultValue) {
+        return (node != null && node.isInt()) ? node.asInt() : defaultValue;
     }
 
-    public Boolean asBoolean() {
-        return (node != null && node.isBoolean()) ? node.asBoolean() : null;
+    public Boolean asBoolean(Boolean defaultValue) {
+        return (node != null && node.isBoolean()) ? node.asBoolean() : defaultValue;
     }
 
     public boolean isObject() {

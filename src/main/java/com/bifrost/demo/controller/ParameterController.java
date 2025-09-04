@@ -8,7 +8,7 @@ import com.bifrost.demo.dto.response.BaseResponse;
 import com.bifrost.demo.dto.response.ServiceResponse;
 import com.bifrost.demo.service.parameter.DefaultParameterService;
 import com.bifrost.demo.service.parameter.ParameterService;
-import com.bifrost.demo.service.util.ResponseUtil;
+import com.bifrost.demo.util.ResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +25,7 @@ public class ParameterController {
 
     @DailyLimit(id = "getById", max = 10)
     @GetMapping("/parameter/{id}")
-    public ResponseEntity<BaseResponse> getById(@PathVariable String id) {
+    public ResponseEntity<BaseResponse> getParameterById(@PathVariable String id) {
         ServiceResponse<DataEntry> res = parameterService.getEntryById(id);
 
         if (res.isSuccess()) {
@@ -68,7 +68,7 @@ public class ParameterController {
 
     @DailyLimit(id = "deleteById", max = 10)
     @DeleteMapping("/parameter/{id}")
-    public ResponseEntity<BaseResponse> deleteById(@PathVariable String id) {
+    public ResponseEntity<BaseResponse> deleteParameterById(@PathVariable String id) {
         ServiceResponse<Boolean> res = parameterService.deleteEntryById(id);
 
         if (res.isSuccess()) {
@@ -81,7 +81,7 @@ public class ParameterController {
 
     @DailyLimit(id = "getEntries", max = 10)
     @GetMapping("/parameter")
-    public ResponseEntity<BaseResponse> getEntries(
+    public ResponseEntity<BaseResponse> getParameterEntries(
             @RequestHeader(value = "X-Limit", required = true) int limit
     ) {
         ServiceResponse<List<DataEntry>> res = parameterService.getEntries(limit);

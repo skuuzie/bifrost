@@ -2,11 +2,11 @@ package com.bifrost.demo.service.encryption;
 
 import com.bifrost.demo.dto.model.JSONEntry;
 import com.bifrost.demo.dto.response.ServiceResponse;
-import com.bifrost.demo.registry.ParameterRegistry;
 import com.bifrost.demo.service.monitoring.CloudWatchService;
 import com.bifrost.demo.service.monitoring.LogService;
-import com.bifrost.demo.service.util.CryptoUtil;
-import com.bifrost.demo.service.util.EncodingUtil;
+import com.bifrost.demo.service.parameter.ParameterRegistry;
+import com.bifrost.demo.util.CryptoUtil;
+import com.bifrost.demo.util.EncodingUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class DefaultEncryptionService implements EncryptionService {
             return;
         }
 
-        maxSizeInBytes = param.get("maxDataSizeInBytes").asInt();
+        maxSizeInBytes = param.get("maxDataSizeInBytes").asInt(0);
     }
 
     public ServiceResponse<Void> allowRequest(byte[] data) {
@@ -71,8 +71,8 @@ public class DefaultEncryptionService implements EncryptionService {
             byte[] enc = CryptoUtil.AESGCMEncrypt(this.commonKey, token, _data);
             return ServiceResponse.success(EncodingUtil.b64EncodeUrlSafe(enc));
         } catch (Exception e) {
-            e.printStackTrace(System.out);
-            return ServiceResponse.failure(ServiceResponse.ServiceError.GENERAL_ERROR, e.getMessage());
+            log.error(e);
+            return ServiceResponse.failure(ServiceResponse.ServiceError.SERVICE_ERROR, e.getMessage());
         }
     }
 
@@ -89,8 +89,8 @@ public class DefaultEncryptionService implements EncryptionService {
             byte[] dec = CryptoUtil.AESGCMDecrypt(this.commonKey, token, _data);
             return ServiceResponse.success(new String(dec, StandardCharsets.UTF_8));
         } catch (Exception e) {
-            e.printStackTrace(System.out);
-            return ServiceResponse.failure(ServiceResponse.ServiceError.GENERAL_ERROR, e.getMessage());
+            log.error(e);
+            return ServiceResponse.failure(ServiceResponse.ServiceError.SERVICE_ERROR, e.getMessage());
         }
     }
 

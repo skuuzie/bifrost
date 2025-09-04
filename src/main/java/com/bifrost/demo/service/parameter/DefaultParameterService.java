@@ -8,7 +8,6 @@ import com.bifrost.demo.service.monitoring.CloudWatchService;
 import com.bifrost.demo.service.monitoring.LogService;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Service
@@ -32,10 +31,11 @@ public class DefaultParameterService implements ParameterService {
             }
 
             return ServiceResponse.success(entry);
-        } catch (SQLException e) {
-            e.printStackTrace(System.out);
+        } catch (Exception e) {
+            log.error(e);
+
             return ServiceResponse
-                    .failure(ServiceResponse.ServiceError.GENERAL_ERROR, e.getMessage());
+                    .failure(ServiceResponse.ServiceError.SERVICE_ERROR, e.getMessage());
         }
     }
 
@@ -43,9 +43,10 @@ public class DefaultParameterService implements ParameterService {
     public ServiceResponse<List<DataEntry>> getEntries(int limit) {
         try {
             return ServiceResponse.success(parameterRepository.getEntries(limit));
-        } catch (SQLException e) {
-            e.printStackTrace(System.out);
-            return ServiceResponse.failure(ServiceResponse.ServiceError.GENERAL_ERROR, e.getMessage());
+        } catch (Exception e) {
+            log.error(e);
+
+            return ServiceResponse.failure(ServiceResponse.ServiceError.SERVICE_ERROR, e.getMessage());
         }
     }
 
@@ -57,7 +58,7 @@ public class DefaultParameterService implements ParameterService {
 
             if (newEntry == null) {
                 return ServiceResponse
-                        .failure(ServiceResponse.ServiceError.GENERAL_ERROR, "Unknown error.");
+                        .failure(ServiceResponse.ServiceError.SERVICE_ERROR, "Unknown error.");
             }
 
             log.info(
@@ -67,9 +68,10 @@ public class DefaultParameterService implements ParameterService {
             return ServiceResponse
                     .success(newEntry);
         } catch (Exception e) {
-            e.printStackTrace(System.out);
+            log.error(e);
+
             return ServiceResponse
-                    .failure(ServiceResponse.ServiceError.GENERAL_ERROR, e.getMessage());
+                    .failure(ServiceResponse.ServiceError.SERVICE_ERROR, e.getMessage());
         }
     }
 
@@ -86,10 +88,11 @@ public class DefaultParameterService implements ParameterService {
             );
 
             return ServiceResponse.success(null);
-        } catch (SQLException e) {
-            e.printStackTrace(System.out);
+        } catch (Exception e) {
+            log.error(e);
+
             return ServiceResponse
-                    .failure(ServiceResponse.ServiceError.GENERAL_ERROR, e.getMessage());
+                    .failure(ServiceResponse.ServiceError.SERVICE_ERROR, e.getMessage());
         }
     }
 
@@ -106,10 +109,11 @@ public class DefaultParameterService implements ParameterService {
             );
 
             return ServiceResponse.success(null);
-        } catch (SQLException e) {
-            e.printStackTrace(System.out);
+        } catch (Exception e) {
+            log.error(e);
+
             return ServiceResponse
-                    .failure(ServiceResponse.ServiceError.GENERAL_ERROR, e.getMessage());
+                    .failure(ServiceResponse.ServiceError.SERVICE_ERROR, e.getMessage());
         }
     }
 }

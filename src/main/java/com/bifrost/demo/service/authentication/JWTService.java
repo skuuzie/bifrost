@@ -3,10 +3,10 @@ package com.bifrost.demo.service.authentication;
 import com.bifrost.demo.dto.model.BifrostUser;
 import com.bifrost.demo.dto.model.JSONEntry;
 import com.bifrost.demo.dto.response.ServiceResponse;
-import com.bifrost.demo.registry.ParameterRegistry;
 import com.bifrost.demo.service.monitoring.CloudWatchService;
 import com.bifrost.demo.service.monitoring.LogService;
-import com.bifrost.demo.service.util.EncodingUtil;
+import com.bifrost.demo.service.parameter.ParameterRegistry;
+import com.bifrost.demo.util.EncodingUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -44,7 +44,7 @@ public class JWTService implements TokenService {
             return null;
         }
 
-        if (!param.get("allowUserTokenAuthentication").asBoolean()) {
+        if (!param.get("allowUserTokenAuthentication").asBoolean(false)) {
             log.info("allowUserTokenAuthentication is false | rejecting user token authentication");
             return ServiceResponse.failure(ServiceResponse.ServiceError.SERVER_LIMIT, "Currently user token authentication is not allowed.");
         }
@@ -77,12 +77,10 @@ public class JWTService implements TokenService {
             BifrostUser user = new BifrostUser(username, role, token);
             return ServiceResponse.success(user);
         } catch (Exception e) {
-            log.error(
-                    String.format("JWTService::createToken: %s", e.getMessage())
-            );
+            log.error(e);
 
             return ServiceResponse
-                    .failure(ServiceResponse.ServiceError.GENERAL_ERROR, "Failed to create token.");
+                    .failure(ServiceResponse.ServiceError.SERVICE_ERROR, "Failed to create token.");
         }
     }
 
@@ -108,6 +106,8 @@ public class JWTService implements TokenService {
 
             return ServiceResponse.success(user);
         } catch (JwtException e) {
+            log.error(e);
+
             return ServiceResponse
                     .failure(ServiceResponse.ServiceError.BAD_INPUT, "Invalid or expired token");
         }

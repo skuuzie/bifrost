@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class RootController {
     @RequestMapping("/")
     public ResponseEntity<Void> root() {
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 }

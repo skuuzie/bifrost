@@ -10,7 +10,7 @@ import com.bifrost.demo.service.authentication.JWTService;
 import com.bifrost.demo.service.authentication.OTPService;
 import com.bifrost.demo.service.authentication.RedisOTPService;
 import com.bifrost.demo.service.authentication.TokenService;
-import com.bifrost.demo.service.util.ResponseUtil;
+import com.bifrost.demo.util.ResponseUtil;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -46,7 +46,6 @@ public class UserController {
             @RequestHeader("X-Role") String role,
             @RequestBody TemporaryAdminTokenRequest req
     ) {
-
         Optional<BifrostUser.Role> _role = BifrostUser.Role.validateRegisterInput(role);
 
         if (_role.isEmpty()) {

@@ -6,7 +6,7 @@ import com.bifrost.demo.dto.response.BaseResponse;
 import com.bifrost.demo.dto.response.ServiceResponse;
 import com.bifrost.demo.service.encryption.DefaultEncryptionService;
 import com.bifrost.demo.service.encryption.EncryptionService;
-import com.bifrost.demo.service.util.ResponseUtil;
+import com.bifrost.demo.util.ResponseUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
