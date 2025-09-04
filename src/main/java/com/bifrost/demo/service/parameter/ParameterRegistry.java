@@ -1,9 +1,7 @@
-package com.bifrost.demo.registry;
+package com.bifrost.demo.service.parameter;
 
 import com.bifrost.demo.dto.model.DataEntry;
 import com.bifrost.demo.dto.model.JSONEntry;
-import com.bifrost.demo.service.parameter.DefaultParameterService;
-import com.bifrost.demo.service.parameter.ParameterService;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 

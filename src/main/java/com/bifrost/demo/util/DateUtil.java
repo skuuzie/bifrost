@@ -1,4 +1,4 @@
-package com.bifrost.demo.service.util;
+package com.bifrost.demo.util;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

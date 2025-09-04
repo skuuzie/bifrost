@@ -1,4 +1,4 @@
-package com.bifrost.demo.service.util;
+package com.bifrost.demo.util;
 
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;

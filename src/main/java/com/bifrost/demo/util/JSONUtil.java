@@ -1,4 +1,4 @@
-package com.bifrost.demo.service.util;
+package com.bifrost.demo.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
