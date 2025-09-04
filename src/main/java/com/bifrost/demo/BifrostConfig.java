@@ -1,7 +1,9 @@
 package com.bifrost.demo;
 
 import com.bifrost.demo.dto.model.OTP;
+import com.bifrost.demo.dto.model.ResumeRoastCache;
 import com.bifrost.demo.middleware.AdminEndpointInterceptor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -30,12 +32,26 @@ public class BifrostConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public RedisTemplate<String, OTP> redisTemplate(RedisConnectionFactory connectionFactory) {
+    @ConditionalOnProperty(value = "admin.redis.enabled", havingValue = "true", matchIfMissing = true)
+    public RedisTemplate<String, OTP> redisOTPTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, OTP> template = new RedisTemplate<>();
 
         template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(OTP.class));
+        template.afterPropertiesSet();
+
+        return template;
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "admin.redis.enabled", havingValue = "true", matchIfMissing = true)
+    public RedisTemplate<String, ResumeRoastCache> redisResumeRoastCachingTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, ResumeRoastCache> template = new RedisTemplate<>();
+
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(ResumeRoastCache.class));
         template.afterPropertiesSet();
 
         return template;
@@ -49,6 +65,21 @@ public class BifrostConfig implements WebMvcConfigurer {
         executor.setMaxPoolSize(5);
         executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("Email-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(30);
+        executor.initialize();
+
+        return executor;
+    }
+
+    @Bean(name = "resumeRoasterTaskExecutor")
+    public TaskExecutor resumeRoasterTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("ResumeRoaster-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
