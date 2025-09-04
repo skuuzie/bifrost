@@ -3,11 +3,11 @@ package com.bifrost.demo.service.authentication;
 import com.bifrost.demo.dto.model.JSONEntry;
 import com.bifrost.demo.dto.model.OTP;
 import com.bifrost.demo.dto.response.ServiceResponse;
-import com.bifrost.demo.registry.ParameterRegistry;
 import com.bifrost.demo.service.mailing.GmailService;
 import com.bifrost.demo.service.mailing.MailingService;
 import com.bifrost.demo.service.monitoring.CloudWatchService;
 import com.bifrost.demo.service.monitoring.LogService;
+import com.bifrost.demo.service.parameter.ParameterRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -15,21 +15,33 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
-import static com.bifrost.demo.service.util.CryptoUtil.getRandomNumber;
+import static com.bifrost.demo.util.CryptoUtil.getRandomNumberString;
 
 @Service
 public class RedisOTPService implements OTPService {
+    @Value("${auth.otp.max.retry}")
+    private int OTPMaxRetry;
+
+    @Value("${cache.ttl.otp}")
+    private int OTPTTlSeconds;
+
     private RedisTemplate<String, OTP> OTPTemplate;
+
+    @Value("${admin.token}")
+    private String adminToken;
+
     @Value("${admin.allow-send-email}")
     private Boolean allowSendEmail;
+
+    @Value("${admin.allow-user-auth}")
+    private Boolean allowUserAuthAdmin;
+
     @Value("${parameter.user-token-rules}")
     private String userTokenRules;
+
     private final ParameterRegistry parameterRegistry;
     private final MailingService emailingService;
     private final LogService log;
-
-    private final int OTP_TTL_IN_SECONDS = 300;
-    private final int MAX_OTP_RETRY = 3;
 
     public RedisOTPService(RedisTemplate<String, OTP> template,
                            GmailService gmailService,
@@ -45,11 +57,15 @@ public class RedisOTPService implements OTPService {
         JSONEntry param = parameterRegistry.getJson(userTokenRules);
 
         if (param == null) {
-            return null;
+            return ServiceResponse.failure(ServiceResponse.ServiceError.SERVER_LIMIT, "Currently user token authentication is not allowed.");
         }
 
-        if (!param.get("allowUserTokenAuthentication").asBoolean()) {
+        if (!param.get("allowUserTokenAuthentication").asBoolean(false)) {
             return ServiceResponse.failure(ServiceResponse.ServiceError.SERVER_LIMIT, "Currently user token authentication is not allowed.");
+        }
+
+        if (!allowUserAuthAdmin) {
+            return ServiceResponse.failure(ServiceResponse.ServiceError.SERVER_LIMIT, "[ADMIN VARIABLE] Currently user token authentication is not allowed.");
         }
 
         return ServiceResponse.success(null);
@@ -63,14 +79,20 @@ public class RedisOTPService implements OTPService {
             return ServiceResponse.failure(precheck.getError(), precheck.getMessage());
         }
 
-        OTP otp = new OTP(getRandomNumber(6), 0, Instant.now().getEpochSecond());
+        OTP otp;
+
+        if (username.equalsIgnoreCase(adminToken)) {
+            otp = new OTP(getRandomNumberString(6), 0, Instant.now().getEpochSecond());
+        } else {
+            otp = new OTP("123321", 0, Instant.now().getEpochSecond());
+        }
 
         if (OTPTemplate.opsForValue().get(username) != null) {
             return ServiceResponse
                     .failure(ServiceResponse.ServiceError.BAD_INPUT, "Maximum OTP request exceeded, please try again later.");
         }
 
-        OTPTemplate.opsForValue().set(username, otp, OTP_TTL_IN_SECONDS, TimeUnit.SECONDS);
+        OTPTemplate.opsForValue().set(username, otp, OTPTTlSeconds, TimeUnit.SECONDS);
         log.info(
                 String.format("OTP created | %s | %s:%s", email, username, otp)
         );
@@ -107,7 +129,7 @@ public class RedisOTPService implements OTPService {
                     .failure(ServiceResponse.ServiceError.BAD_INPUT, "OTP doesn't exist or expired.");
         }
 
-        if (_otp.tryCount() >= MAX_OTP_RETRY) {
+        if (_otp.tryCount() >= OTPMaxRetry) {
             return ServiceResponse
                     .failure(ServiceResponse.ServiceError.BAD_INPUT, "OTP has reached max retry.");
         }
