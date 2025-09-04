@@ -39,7 +39,7 @@ public class ServiceResponse<T> {
 
     public enum ServiceError {
         NONE,
-        GENERAL_ERROR,
+        SERVICE_ERROR,
         SERVER_LIMIT,
         BAD_INPUT
     }
