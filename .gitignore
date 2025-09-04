@@ -1,6 +1,8 @@
 .ebextensions/
 application.yml
 *.properties
+**/src/main/resources/**/*.json
+**/src/main/resources/**/*.pdf
 
 HELP.md
 target/
