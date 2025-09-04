@@ -1,25 +1,38 @@
 admin:
-  allow-send-email: true
+  allow-send-email: ''
+  allow-user-auth: ''
+  redis:
+    enabled: ''
   token: ''
+auth:
+  otp.max.retry: ''
+cache:
+  ttl:
+    otp: ''
+    resume-roast: ''
 crypto:
-  common-key: 'base64'
-  secret-token-key: 'base64'
+  common-key: ''
+  secret-token-key: ''
 db:
   aurora:
     cluster:
       endpoint: ''
       region: ''
-    table:
-      parameters: ''
 logging:
   level:
+    com.bifrost.demo: ''
     io.lettuce.core: ''
     org.springframework.data.redis: ''
+    remote.debug: ''
 monitoring:
   cloudwatch:
     group-name: ''
     region: ''
     stream-name: ''
+network:
+  api:
+    key:
+      google-gemini: ''
 parameter:
   encryption-rules: ''
   user-token-rules: ''
@@ -29,7 +42,7 @@ spring:
       host: ''
       port: ''
       ssl:
-        enabled: true
+        enabled: ''
   mail:
     host: ''
     password: ''
@@ -38,5 +51,9 @@ spring:
       mail.smtp.auth: ''
       mail.smtp.starttls.enable: ''
     username: ''
+  servlet:
+    multipart:
+      max-file-size: ''
+      max-request-size: ''
 springdoc:
   paths-to-exclude: ''
