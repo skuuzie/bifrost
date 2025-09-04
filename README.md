@@ -1,12 +1,22 @@
-Java Spring sandbox backend app - (that i think) easy to scale.
+Java Spring practice/sandbox backend app - (that i think) proper and easy to modify
+
+Currently utilizing AWS products for deployment, database, and logging/monitoring. Namely AWS CloudWatch, Aurora DSQL, API Gateway, and EC2.
 
 Some demonstrated feature:
 
-- AWS Aurora (PostgreSQL) for dynamic parameter registry
-- AWS ElasticSearch (Redis) for authentication management
-- AWS CloudWatch for log/monitoring
+- Dynamic runtime system parameter registry (i.e. modify variable without redeployment)
+- OTP & JWT for authentication
+- Remote logging/monitoring
 - Symmetric encryption APIs
+- AI (Google Gemini) Resume Roaster with Async Processing & Caching
+- Simple controller-level unit testing
 - TBD.
+
+Stack:
+
+- Java Spring
+- PostgreSQL
+- Redis
 
 ## Build command
 
